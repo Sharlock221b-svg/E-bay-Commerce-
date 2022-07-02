@@ -88,7 +88,6 @@ def logout_view(request):
     logout(request)
     return HttpResponseRedirect(reverse("index"))
 
-
 def register(request):
     if request.method == "POST":
         username = request.POST["username"]
@@ -129,7 +128,8 @@ def createListing(request):
             description=form.cleaned_data["description"],
             price=form.cleaned_data["price"],
             category=form.cleaned_data["category"],
-            image_url=form.cleaned_data["imgUrl"]
+            image_url=form.cleaned_data["imgUrl"],
+            creator=User.objects.get(pk=request.user.id),
          )
          p.save()
          return HttpResponseRedirect(reverse("index"))

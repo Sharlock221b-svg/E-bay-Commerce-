@@ -1,6 +1,7 @@
 from datetime import datetime
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+import django.contrib.auth.models 
 
 
 class User(AbstractUser):
@@ -8,13 +9,13 @@ class User(AbstractUser):
 
 class auctionProduct(models.Model):
     title = models.CharField(max_length=100)
-    description = models.CharField(max_length=1000)
+    description = models.CharField(max_length=2000)
     price = models.IntegerField()
     category = models.CharField(max_length=15)
     image_url = models.URLField(blank=True,max_length=500)
     time = models.DateTimeField(default=datetime.utcnow())
     active = models.BooleanField(default=True)
+    creator = models.ForeignKey(User, on_delete=models.CASCADE, related_name="products",null=True)
 
-   # created_by = models.ManyToOneRel(User, base=CASCADE)
     def __str__(self):
         return f"{self.title}: {self.price} created"
