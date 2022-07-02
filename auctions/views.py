@@ -3,8 +3,53 @@ from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
-
+from django.contrib.auth.decorators import login_required
 from .models import User
+from django import forms
+
+CATEGORIES = [
+    ('fashion','Fashion'),
+    ('toy', 'Toys'),
+    ('electronics', 'Electronics'),
+    ('home', 'Home'),
+    ('books','Books'),
+    ('coumputers','Computers'),
+    ('real estate', 'Real Estate'),
+    ('sports', 'Sports')
+]
+
+class createNew(forms.Form):
+    title = forms.CharField(
+        max_length=100,
+        widget=forms.TextInput(attrs={"placeholder": "Title", "class": "form-control"}),
+    )
+    description = forms.CharField(
+        min_length=50,
+        widget=forms.Textarea(
+            attrs={"placeholder": "Description", "class": "form-control"}
+        ),
+    )
+    price = forms.IntegerField(
+        min_value=1,
+        label="Price $",
+        widget=forms.NumberInput(
+            attrs={"placeholder": "Base Bid", "class": "form-control"}
+        ),
+    )
+    category = forms.CharField(
+        label="Category",
+        widget=forms.Select(
+            attrs={"class": "form-control"},
+            choices=CATEGORIES
+        )
+    )
+    imgUrl = forms.URLField(
+        required=False,
+        label="Image URL",
+        widget=forms.URLInput(
+            attrs={"class": "form-control", "placeholder": "Image URL"}
+        )
+    )
 
 
 def index(request):
@@ -24,9 +69,11 @@ def login_view(request):
             login(request, user)
             return HttpResponseRedirect(reverse("index"))
         else:
-            return render(request, "auctions/login.html", {
-                "message": "Invalid username and/or password."
-            })
+            return render(
+                request,
+                "auctions/login.html",
+                {"message": "Invalid username and/or password."},
+            )
     else:
         return render(request, "auctions/login.html")
 
@@ -45,19 +92,26 @@ def register(request):
         password = request.POST["password"]
         confirmation = request.POST["confirmation"]
         if password != confirmation:
-            return render(request, "auctions/register.html", {
-                "message": "Passwords must match."
-            })
+            return render(
+                request, "auctions/register.html", {"message": "Passwords must match."}
+            )
 
         # Attempt to create new user
         try:
             user = User.objects.create_user(username, email, password)
             user.save()
         except IntegrityError:
-            return render(request, "auctions/register.html", {
-                "message": "Username already taken."
-            })
+            return render(
+                request,
+                "auctions/register.html",
+                {"message": "Username already taken."},
+            )
         login(request, user)
         return HttpResponseRedirect(reverse("index"))
     else:
         return render(request, "auctions/register.html")
+
+
+@login_required
+def createListing(request):
+    return render(request, "auctions/create.html", {"form": createNew()})

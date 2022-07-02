@@ -1,0 +1,11 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    <h1>Create New Auction</h1>
+     
+    <form >
+         {% csrf_token %}
+         {{ form }}
+    </form>
+  
+{% endblock %}
