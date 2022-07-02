@@ -4,8 +4,9 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
-from .models import User
+from .models import User,auctionProduct
 from django import forms
+from datetime import datetime
 
 CATEGORIES = [
     ('fashion','Fashion'),
@@ -21,10 +22,12 @@ CATEGORIES = [
 class createNew(forms.Form):
     title = forms.CharField(
         max_length=100,
+        min_length=2,
         widget=forms.TextInput(attrs={"placeholder": "Title", "class": "form-control"}),
     )
     description = forms.CharField(
-        min_length=50,
+        min_length=15,
+        max_length=1000,
         widget=forms.Textarea(
             attrs={"placeholder": "Description", "class": "form-control"}
         ),
@@ -112,6 +115,21 @@ def register(request):
         return render(request, "auctions/register.html")
 
 
-@login_required
+@login_required(login_url='login')
 def createListing(request):
+    if request.method == "POST":
+       form = createNew(request.POST)
+
+       if form.is_valid():
+         p = auctionProduct(
+            title=form.cleaned_data["title"],
+            description=form.cleaned_data["description"],
+            price=form.cleaned_data["price"],
+            category=form.cleaned_data["category"],
+            image_url=form.cleaned_data["imgUrl"]
+         )
+         p.save()
+         return render(request, "auctions/index.html")
+       else:
+          return HttpResponse("Invalid Data Filled!!")
     return render(request, "auctions/create.html", {"form": createNew()})

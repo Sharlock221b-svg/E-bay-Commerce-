@@ -3,9 +3,10 @@
 {% block body %}
     <h1>Create New Auction</h1>
      
-    <form >
+    <form action={% url 'createListing' %} method="post">
          {% csrf_token %}
          {{ form }}
+         <input type="Submit" value="Create"  class="btn btn-success" style="width: 80%; font-weight: 700; font-size: 18px;">
     </form>
   
 {% endblock %}
