@@ -13,6 +13,7 @@ class auctionProduct(models.Model):
     category = models.CharField(max_length=15)
     image_url = models.URLField(blank=True,max_length=500)
     time = models.DateTimeField(default=datetime.utcnow())
+    active = models.BooleanField(default=True)
 
    # created_by = models.ManyToOneRel(User, base=CASCADE)
     def __str__(self):

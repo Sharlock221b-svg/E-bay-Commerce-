@@ -2,6 +2,18 @@
 
 {% block body %}
     <h2>Active Listings</h2>
-
-    TODO
+    
+    <div class="activeListing">
+        {% for product in products %}
+        <div class="block">
+          <img src="{{ product.image_url }}" class="rounded float-left" alt={{ product.title }}>
+          <div class="des">
+              <h2>{{ product.title }}</h2>
+              <p>{{ product.description }}</p>
+              <p> <span>Price:</span> {{ product.price }}$</p>
+              <p>Created {{ product.time }}</p>
+          </div>
+        </div>
+        {% endfor %}
+    </div>
 {% endblock %}

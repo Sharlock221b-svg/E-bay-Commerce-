@@ -56,7 +56,10 @@ class createNew(forms.Form):
 
 
 def index(request):
-    return render(request, "auctions/index.html")
+
+    return render(request, "auctions/index.html",{
+        "products": auctionProduct.objects.filter(active=True).values()
+    })
 
 
 def login_view(request):
@@ -129,7 +132,7 @@ def createListing(request):
             image_url=form.cleaned_data["imgUrl"]
          )
          p.save()
-         return render(request, "auctions/index.html")
+         return HttpResponseRedirect(reverse("index"))
        else:
           return HttpResponse("Invalid Data Filled!!")
     return render(request, "auctions/create.html", {"form": createNew()})
