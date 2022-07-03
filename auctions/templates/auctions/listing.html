@@ -12,8 +12,11 @@
         max-width: 500px;
         max-height: 400px;
         padding: auto auto auto auto;
-    }
-    
+      }
+      .btn-danger, .btn{
+        width: max-content;
+        margin-top: 10px;
+      }
 </style>
 
 {% endblock %}
@@ -45,6 +48,11 @@
            Listed On:  {{ product.time }}
            <br />
            Category:  {{ product.category|capfirst }} 
+           <form action="{% url 'addWish' %}" method="post">
+              {% csrf_token %}
+              <input type="hidden" name="p_id" value={{ product.id }}>
+              <input type="Submit" value="Add to Wishlist" class="btn btn-danger" style="background-color: #EC84F6; border-color: #EC84F6">
+           </form>
         </div>
     </div>    
     
