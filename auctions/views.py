@@ -136,3 +136,11 @@ def createListing(request):
        else:
           return HttpResponse("Invalid Data Filled!!")
     return render(request, "auctions/create.html", {"form": createNew()})
+
+
+def listing(request,id):
+    product = auctionProduct.objects.get(pk=id)
+    return render(request, "auctions/listing.html", 
+    {
+        "product": product
+    })

@@ -66,3 +66,20 @@ body {
 span{
     color: black;
 }
+
+
+.info-block > img{
+    image-rendering: auto;
+    max-width: 300px;
+    max-height: 300px;
+    padding: auto auto auto auto;
+}
+
+.infoblock{
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    width: 98%;
+    margin-top: 9px;
+ }
+

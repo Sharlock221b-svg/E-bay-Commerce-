@@ -1,11 +1,10 @@
 from datetime import datetime
 from django.contrib.auth.models import AbstractUser
 from django.db import models
-import django.contrib.auth.models 
-
 
 class User(AbstractUser):
     pass
+
 
 class auctionProduct(models.Model):
     title = models.CharField(max_length=100)

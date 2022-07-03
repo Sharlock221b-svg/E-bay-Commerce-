@@ -1,0 +1,51 @@
+{% extends "auctions/layout.html" %}
+
+{% block style %}
+
+<style>
+      .des{
+         margin-top: 0px;
+         margin-left: 10%;
+      }
+      img{
+        image-rendering: auto;
+        max-width: 500px;
+        max-height: 400px;
+        padding: auto auto auto auto;
+    }
+    
+</style>
+
+{% endblock %}
+
+{% block body %}
+    <h2>Listing : {{ product.title }}</h2>
+
+    <div class="infoblock">
+        <img src="{{ product.image_url }}" alt="{{ product.title }}">
+        <div class="des">
+           <h4>Owned by <span style="color: #3A00EF">{{ product.creator }}</span> </h4>
+           Highest Bid: <span style="font-size: 21px; color: #3A00EF;">
+            {% if highest_bid %} 
+            {{ highest_bid }} $
+            {% else %}
+             {{ product.price }} $ 
+            {% endif %}
+           </span> 
+           <br />
+           Base Price: <span style="font-size: 21px; color: #3A00EF;">
+            {{ product.price }} $
+           </span>
+           <br />
+           <br />
+           <h4>Description:</h4>
+           {{ product.description }}
+           <br />
+           <br />
+           Listed On:  {{ product.time }}
+           <br />
+           Category:  {{ product.category|capfirst }} 
+        </div>
+    </div>    
+    
+{% endblock %}
