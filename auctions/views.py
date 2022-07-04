@@ -4,7 +4,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
-from .models import User,auctionProduct,Wishlist
+from .models import User,auctionProduct,Wishlist,Bids
 from django import forms
 from datetime import datetime
 
@@ -18,6 +18,10 @@ CATEGORIES = [
     ('real estate', 'Real Estate'),
     ('sports', 'Sports')
 ]
+
+global_var = {
+    "res": None,
+}
 
 class createNew(forms.Form):
     title = forms.CharField(
@@ -51,6 +55,14 @@ class createNew(forms.Form):
         label="Image URL",
         widget=forms.URLInput(
             attrs={"class": "form-control", "placeholder": "Image URL"}
+        )
+    )
+
+class BidForm(forms.Form):
+    top_bid = forms.IntegerField(
+        label="Place Your Bid",
+        widget=forms.NumberInput(
+            attrs={"class": "form-control", "placeholder": "Bid $"}
         )
     )
 
@@ -147,10 +159,15 @@ def listing(request,id):
     except:
         hearted = False
     
+    res = global_var["res"]
+    global_var["res"] = None
+    #print(res)
     return render(request, "auctions/listing.html", 
     {
         "product": product,
-         "wish": hearted   
+         "wish": hearted,
+         "Bid": BidForm(),
+         "res": res
     })
 
     
@@ -167,6 +184,7 @@ def addWish(request):
         return HttpResponseRedirect(reverse("listing", args=(request.POST['p_id'],)))
 
 
+@login_required(login_url='login')
 def removeWish(request):
     if request.method == "POST":
         user = User.objects.get(pk=request.user.id)
@@ -176,5 +194,36 @@ def removeWish(request):
         except IntegrityError:
             return HttpResponse("Product has been already removed from your Wishlist.")
         return HttpResponseRedirect(reverse("listing", args=(request.POST['p_id'],)))
-    
+
+
+@login_required(login_url='login')   
+def bid(request,id):
+    if request.method == "POST":
+        print(id)
+        form = BidForm(request.POST)
+        if form.is_valid():
+            top_bid = form.cleaned_data["top_bid"]
+            print(top_bid)
+            user = User.objects.get(pk=request.user.id)
+            product = auctionProduct.objects.get(pk=id)
+            q = Bids.objects.filter(bider=user,product=product).only('top_bid').order_by('-top_bid').first()
+            
+            if q is not None:
+               #print("above")
+               if top_bid > q.top_bid:
+                  global_var["res"] = "High"
+                  q = Bids(top_bid=top_bid,bider=user,product=product) 
+                  q.save()
+               else:
+                  global_var["res"] = "Low"
+            else:
+                #print("below")
+                if top_bid > product.price:
+                    global_var["res"] = "High"
+                    q = Bids(top_bid=top_bid,bider=user,product=product) 
+                    q.save()
+                else:
+                   global_var["res"] = "Low"
+          
+            return HttpResponseRedirect(reverse("listing", args=(id,)))
     

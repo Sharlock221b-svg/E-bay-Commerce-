@@ -13,12 +13,26 @@
         max-height: 400px;
         padding: auto auto auto auto;
       }
-      .btn-danger, .btn{
-        width: max-content;
-        margin-top: 10px;
+      .bidd{
+         margin-top: 40px;
+         width: 357px;
+         font-size: 22px;
+         color: #1423b7;
       }
 </style>
 
+{% endblock %}
+
+{% block warning %}
+   {% if res == "Low" %}
+   <div class="alert alert-danger" role="alert" style="background-color: #ff7f70">
+      Your Bid should be at least greater than the Highest Bid or the Base Price.
+    </div>
+   {% elif res == "High" %}
+   <div class="alert alert-success" role="alert">
+      You have successfully bidded for the product.
+    </div>    
+   {% endif %}
 {% endblock %}
 
 {% block body %}
@@ -51,13 +65,13 @@
 
            {% if user.is_authenticated %}
             {% if wish == False %}
-            <form action="{% url 'addWish' %}" method="post">
+            <form action="{% url 'addWish' %}" method="post" style="margin-top: 20px;">
                {% csrf_token %}
                <input type="hidden" name="p_id" value={{ product.id }}>
                <input type="Submit" value="Add to Wishlist" class="btn btn-danger" style="background-color: #EC84F6; border-color: #EC84F6">
             </form>
             {% else %}
-            <form action="{% url 'removeWish' %}" method="post">
+            <form action="{% url 'removeWish' %}" method="post" style="margin-top: 20px;">
              {% csrf_token %}
              <input type="hidden" name="p_id" value={{ product.id }}>
              <input type="Submit" value="Remove from Wishlist" class="btn btn-danger"       style="background-color: #F74147; border-color: #F74147">
@@ -66,5 +80,15 @@
            {% endif %}
         </div>
     </div>    
+    
+    {% if user.is_authenticated %}
+    <div class="bidd">
+       <form action="{% url 'bid' product.id %}" method="post">
+         {% csrf_token %}
+         {{ Bid }}
+         <input type="Submit" value="Bid" class="btn btn-success" style="width: 80%;">
+       </form>
+    </div>
+    {% endif %}
     
 {% endblock %}

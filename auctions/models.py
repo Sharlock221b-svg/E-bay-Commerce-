@@ -40,6 +40,9 @@ class Bids(models.Model):
     time = models.DateTimeField(default=datetime.utcnow())
     bider = models.ForeignKey(User,on_delete=models.CASCADE, related_name="userBids", null=True)
     product = models.ForeignKey(auctionProduct,on_delete=models.CASCADE, related_name="productBids")
+
+    def __str__(self):
+        return f"{self.top_bid} by {self.bider} for {self.product.title}"
     
 class Comment(models.Model):
     """This is a Comment model containing:
