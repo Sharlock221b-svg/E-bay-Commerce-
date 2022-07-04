@@ -160,7 +160,6 @@ def listing(request,id):
         wish = Wishlist.objects.get(user=user,product=product)
     except:
         hearted = False
-
     
     q = Bids.objects.filter(product=product).order_by('-top_bid').first()
     no_bids = Bids.objects.filter(product=product).count()
@@ -186,7 +185,6 @@ def listing(request,id):
          "count": no_bids,
          "bidder": bider
     })
-
     
 @login_required(login_url='login')
 def addWish(request):
