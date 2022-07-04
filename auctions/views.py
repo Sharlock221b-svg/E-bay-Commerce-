@@ -61,6 +61,7 @@ class createNew(forms.Form):
 class BidForm(forms.Form):
     top_bid = forms.IntegerField(
         label="Place Your Bid",
+        min_value=1,
         widget=forms.NumberInput(
             attrs={"class": "form-control", "placeholder": "Bid $"}
         )
@@ -153,21 +154,37 @@ def createListing(request):
 def listing(request,id):
     product = auctionProduct.objects.get(pk=id)
     hearted = True
+    #Wishlist Query
     try:
         user = User.objects.get(pk=request.user.id)
         wish = Wishlist.objects.get(user=user,product=product)
     except:
         hearted = False
+
     
+    q = Bids.objects.filter(product=product).order_by('-top_bid').first()
+    no_bids = Bids.objects.filter(product=product).count()
+        
     res = global_var["res"]
     global_var["res"] = None
     #print(res)
+     
+    try:
+        top_bid = q.top_bid
+        bider = q.bider
+    except:
+        top_bid = None
+        bider = None
+     
     return render(request, "auctions/listing.html", 
     {
         "product": product,
          "wish": hearted,
          "Bid": BidForm(),
-         "res": res
+         "res": res,
+         "highest_bid": top_bid,
+         "count": no_bids,
+         "bidder": bider
     })
 
     
@@ -206,7 +223,7 @@ def bid(request,id):
             print(top_bid)
             user = User.objects.get(pk=request.user.id)
             product = auctionProduct.objects.get(pk=id)
-            q = Bids.objects.filter(bider=user,product=product).only('top_bid').order_by('-top_bid').first()
+            q = Bids.objects.filter(product=product).only('top_bid').order_by('-top_bid').first()
             
             if q is not None:
                #print("above")

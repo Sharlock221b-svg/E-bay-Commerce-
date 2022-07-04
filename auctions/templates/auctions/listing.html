@@ -16,7 +16,6 @@
       .bidd{
          margin-top: 40px;
          width: 357px;
-         font-size: 22px;
          color: #1423b7;
       }
 </style>
@@ -30,7 +29,7 @@
     </div>
    {% elif res == "High" %}
    <div class="alert alert-success" role="alert">
-      You have successfully bidded for the product.
+      Your Bid has been successfully placed for the product.
     </div>    
    {% endif %}
 {% endblock %}
@@ -83,6 +82,7 @@
     
     {% if user.is_authenticated %}
     <div class="bidd">
+       <h4 style="color: #1D358C">{{ count }} bid's so far Your Bid is the Next</h4>
        <form action="{% url 'bid' product.id %}" method="post">
          {% csrf_token %}
          {{ Bid }}
