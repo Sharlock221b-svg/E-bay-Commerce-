@@ -48,11 +48,22 @@
            Listed On:  {{ product.time }}
            <br />
            Category:  {{ product.category|capfirst }} 
-           <form action="{% url 'addWish' %}" method="post">
-              {% csrf_token %}
-              <input type="hidden" name="p_id" value={{ product.id }}>
-              <input type="Submit" value="Add to Wishlist" class="btn btn-danger" style="background-color: #EC84F6; border-color: #EC84F6">
-           </form>
+
+           {% if user.is_authenticated %}
+            {% if wish == False %}
+            <form action="{% url 'addWish' %}" method="post">
+               {% csrf_token %}
+               <input type="hidden" name="p_id" value={{ product.id }}>
+               <input type="Submit" value="Add to Wishlist" class="btn btn-danger" style="background-color: #EC84F6; border-color: #EC84F6">
+            </form>
+            {% else %}
+            <form action="{% url 'removeWish' %}" method="post">
+             {% csrf_token %}
+             <input type="hidden" name="p_id" value={{ product.id }}>
+             <input type="Submit" value="Remove from Wishlist" class="btn btn-danger"       style="background-color: #F74147; border-color: #F74147">
+            </form>
+            {% endif %}
+           {% endif %}
         </div>
     </div>    
     

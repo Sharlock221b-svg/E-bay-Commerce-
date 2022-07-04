@@ -1,4 +1,3 @@
-from itertools import product
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
@@ -141,12 +140,21 @@ def createListing(request):
 
 def listing(request,id):
     product = auctionProduct.objects.get(pk=id)
+    hearted = True
+    try:
+        user = User.objects.get(pk=request.user.id)
+        wish = Wishlist.objects.get(user=user,product=product)
+    except:
+        hearted = False
+    
     return render(request, "auctions/listing.html", 
     {
-        "product": product
+        "product": product,
+         "wish": hearted   
     })
 
-
+    
+@login_required(login_url='login')
 def addWish(request):
     if request.method == "POST":
         user = User.objects.get(pk=request.user.id)
@@ -157,3 +165,16 @@ def addWish(request):
         except IntegrityError:
             return HttpResponse("Product has been already there on your Wishlist.")
         return HttpResponseRedirect(reverse("listing", args=(request.POST['p_id'],)))
+
+
+def removeWish(request):
+    if request.method == "POST":
+        user = User.objects.get(pk=request.user.id)
+        product = auctionProduct.objects.get(pk=request.POST['p_id'])
+        try:
+            Wishlist.objects.filter(user=user,product=product).delete()
+        except IntegrityError:
+            return HttpResponse("Product has been already removed from your Wishlist.")
+        return HttpResponseRedirect(reverse("listing", args=(request.POST['p_id'],)))
+    
+    
