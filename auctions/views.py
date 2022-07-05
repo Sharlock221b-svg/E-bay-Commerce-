@@ -9,6 +9,7 @@ from .models import User, auctionProduct, Wishlist, Bids, Comment
 from django import forms
 from datetime import datetime
 
+#List of categories
 CATEGORIES = [
     ("fashion", "Fashion"),
     ("toy", "Toys"),
@@ -25,8 +26,7 @@ CATEGORIES = [
 global_var = {
     "res": None,
 }
-
-
+#Form for creating new Product
 class createNew(forms.Form):
     title = forms.CharField(
         max_length=100,
@@ -59,7 +59,7 @@ class createNew(forms.Form):
         ),
     )
 
-
+#Form for Bidding
 class BidForm(forms.Form):
     top_bid = forms.IntegerField(
         label="Place Your Bid",
@@ -69,7 +69,7 @@ class BidForm(forms.Form):
         ),
     )
 
-
+#Form for posting comment
 class CommentForm(forms.Form):
     Comment = forms.CharField(
         min_length=3,
@@ -79,13 +79,12 @@ class CommentForm(forms.Form):
         ),
     )
 
-
+#Index function renders the active products to the page
 def index(request):
-
     return render(
         request,
         "auctions/index.html",
-        {"products": auctionProduct.objects.filter(active=True).values()},
+        {"products": auctionProduct.objects.filter(active=True).order_by("-time").values()},
     )
 
 
@@ -110,12 +109,12 @@ def login_view(request):
     else:
         return render(request, "auctions/login.html")
 
-
+#Logout Function
 def logout_view(request):
     logout(request)
     return HttpResponseRedirect(reverse("index"))
 
-
+#Registration
 def register(request):
     if request.method == "POST":
         username = request.POST["username"]
@@ -147,6 +146,10 @@ def register(request):
 
 @login_required(login_url="login")
 def createListing(request):
+    """ If called vis post validates the product data and
+        save it to the database.
+        Else if called via get the then renders the createNew Form.
+    """
     if request.method == "POST":
         form = createNew(request.POST)
 

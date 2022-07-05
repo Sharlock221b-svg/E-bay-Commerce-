@@ -1,7 +1,6 @@
-from datetime import datetime
-from itertools import product
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.utils.timezone import now
 
 class User(AbstractUser):
     pass
@@ -22,7 +21,7 @@ class auctionProduct(models.Model):
     price = models.IntegerField()
     category = models.CharField(max_length=15)
     image_url = models.URLField(blank=True,max_length=500)
-    time = models.DateTimeField(default=datetime.utcnow())
+    time = models.DateTimeField(default=now())
     active = models.BooleanField(default=True)
     creator = models.ForeignKey(User, on_delete=models.CASCADE, related_name="products",null=True)
     winner = models.ForeignKey(User, on_delete=models.SET_NULL, related_name="winnes",null=True)
@@ -37,7 +36,7 @@ class Bids(models.Model):
        * bidder=> Fk references to the User
     """
     top_bid = models.IntegerField()
-    time = models.DateTimeField(default=datetime.utcnow())
+    time = models.DateTimeField(default=now())
     bider = models.ForeignKey(User,on_delete=models.CASCADE, related_name="userBids", null=True)
     product = models.ForeignKey(auctionProduct,on_delete=models.CASCADE, related_name="productBids")
 
@@ -52,7 +51,7 @@ class Comment(models.Model):
        * commenter=>Fk
     """
     comment = models.CharField(max_length=1000)
-    time = models.DateTimeField(default=datetime.utcnow())
+    time = models.DateTimeField(default=now())
     commenter = models.ForeignKey(User,on_delete=models.CASCADE, related_name="userComment")
     product = models.ForeignKey(auctionProduct,on_delete=models.CASCADE, related_name="productComment")
 
