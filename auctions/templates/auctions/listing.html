@@ -18,11 +18,21 @@
          width: 357px;
          color: #1423b7;
       }
+      .comment{
+         margin-top: 2px;
+      }
+      .rowRow{
+         display: flex;
+         flex-direction: column;
+         align-items: flex-start;
+      }
 </style>
 
 {% endblock %}
 
 {% block warning %}
+   {% if user.is_authenticated %}
+   
    {% if res == "Low" %}
    <div class="alert alert-danger" role="alert" style="background-color: #ff7f70">
       Your Bid should be at least greater than the Highest Bid or the Base Price.
@@ -32,6 +42,14 @@
       Your Bid has been successfully placed for the product.
     </div>    
    {% endif %}
+
+   {% if product.winner.id == user.id and  product.active == False %}
+   <div class="alert alert-success" role="alert">
+      Congratulations!! You have Won the Bid.
+    </div>    
+   {% endif %}
+
+   {% endif %}
 {% endblock %}
 
 {% block body %}
@@ -40,7 +58,7 @@
     <div class="infoblock">
         <img src="{{ product.image_url }}" alt="{{ product.title }}">
         <div class="des">
-           <h4>Owned by <span style="color: #3A00EF">{{ product.creator }}</span> </h4>
+           <h4>Listed by <span style="color: #3A00EF">{{ product.creator }}</span> </h4>
            Highest Bid: <span style="font-size: 21px; color: #3A00EF;">
             {% if highest_bid %} 
             {{ highest_bid }} $
@@ -62,25 +80,33 @@
            <br />
            Category:  {{ product.category|capfirst }} 
 
-           {% if user.is_authenticated %}
+           {% if user.is_authenticated and product.active %}
+
             {% if wish == False %}
             <form action="{% url 'addWish' %}" method="post" style="margin-top: 20px;">
                {% csrf_token %}
                <input type="hidden" name="p_id" value={{ product.id }}>
-               <input type="Submit" value="Add to Wishlist" class="btn btn-danger" style="background-color: #EC84F6; border-color: #EC84F6">
+               <input type="Submit" value="Add to Watchlist" class="btn btn-danger" style="background-color: #EC84F6; border-color: #EC84F6">
             </form>
             {% else %}
             <form action="{% url 'removeWish' %}" method="post" style="margin-top: 20px;">
              {% csrf_token %}
              <input type="hidden" name="p_id" value={{ product.id }}>
-             <input type="Submit" value="Remove from Wishlist" class="btn btn-danger"       style="background-color: #F74147; border-color: #F74147">
+             <input type="Submit" value="Remove from Watchlist" class="btn btn-danger"       style="background-color: #F74147; border-color: #F74147">
             </form>
             {% endif %}
+            {% if product.creator.id == user.id and product.active %}
+                <form action="{% url 'closeAuction' product.id %}" method="post">
+                  {% csrf_token %}
+                  <input type="Submit" value="Close Auction" class="btn btn-danger" style="width: 100%; margin-top: 25px;">
+                </form>
+            {% endif %}
+
            {% endif %}
         </div>
     </div>    
     
-    {% if user.is_authenticated %}
+    {% if user.is_authenticated and product.active%}
     <div class="bidd">
        <h4 style="color: #1D358C">{{ count }} bid's so far Your Bid is the Next</h4>
        <form action="{% url 'bid' product.id %}" method="post">
@@ -90,5 +116,59 @@
        </form>
     </div>
     {% endif %}
+
+
+    {% if user.is_authenticated %}
+    <div class="comment">
+      <div class="card-footer py-3 border-0">
+         <form action="{% url 'addComment' product.id %}" method="post">
+            {% csrf_token %}
+         <div class="d-flex flex-start w-100">
+           <div class="form-outline w-100">
+             {{ CommentForm }}
+           </div>
+         </div>
+         <div class="float-end mt-2 pt-1">
+           <input type="Submit" class="btn btn-primary btn-sm" value="Post Comment">
+         </div>
+         </form>
+       </div>
+    </div>
+    {% endif %}
+
+    <section>
+      <div class="container my-5 py-5" style=" border-radius: 5px;">
+        <div class="row d-flex justify-content-center">
+          <div class="col-md-12 col-lg-10">
+            <div class="card text-dark">
+              <div class="card-body p-4">
+                <h4 class="mb-0">Recent comments</h4>
+                <p class="fw-light mb-4 pb-2">Latest Comments section by users</p>
+
+                {% for comment in comments %}
+                <div class="rowRow">
+                <div class="d-flex flex-start" style="margin-top: 20px; background-color: #92cfc2; width: 850px; padding: 8px; border-radius: 5px;">
+                  <div>
+                    <h6 class="fw-bold mb-1">{{ comment.commenter }}</h6>
+                    <div class="d-flex align-items-center mb-3">
+                      <p class="mb-0">
+                        {{ comment.time }} 
+                      </p>
+                    </div>
+                    <p class="mb-0">
+                      <i style="color: #B14E63">{{ comment.comment }}</i>
+                    </p>
+                  </div>
+               </div>
+                  {% empty %}
+                  <i style="color: #B14E63">No Comments yet..</i>
+                  {% endfor %}
+                </div>
+              </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    
     
 {% endblock %}

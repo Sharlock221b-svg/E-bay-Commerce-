@@ -25,7 +25,7 @@ class auctionProduct(models.Model):
     time = models.DateTimeField(default=datetime.utcnow())
     active = models.BooleanField(default=True)
     creator = models.ForeignKey(User, on_delete=models.CASCADE, related_name="products",null=True)
-
+    winner = models.ForeignKey(User, on_delete=models.SET_NULL, related_name="winnes",null=True)
     def __str__(self):
         return f"{self.title}: {self.price} created"
 
@@ -55,7 +55,6 @@ class Comment(models.Model):
     time = models.DateTimeField(default=datetime.utcnow())
     commenter = models.ForeignKey(User,on_delete=models.CASCADE, related_name="userComment")
     product = models.ForeignKey(auctionProduct,on_delete=models.CASCADE, related_name="productComment")
-
 
 class Wishlist(models.Model):
     """This is a Wishlist model containing:

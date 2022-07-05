@@ -1,10 +1,11 @@
+from itertools import product
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
-from .models import User,auctionProduct,Wishlist,Bids
+from .models import User,auctionProduct,Wishlist,Bids,Comment
 from django import forms
 from datetime import datetime
 
@@ -65,6 +66,15 @@ class BidForm(forms.Form):
         widget=forms.NumberInput(
             attrs={"class": "form-control", "placeholder": "Bid $"}
         )
+    )
+
+class CommentForm(forms.Form):
+    Comment = forms.CharField(
+        min_length=3,
+        max_length=1000,
+        widget=forms.Textarea(
+            attrs={"placeholder": "Comment", "class": "form-control", "rows": 4}
+        ),
     )
 
 
@@ -166,15 +176,16 @@ def listing(request,id):
         
     res = global_var["res"]
     global_var["res"] = None
-    #print(res)
-     
+
     try:
         top_bid = q.top_bid
         bider = q.bider
     except:
         top_bid = None
         bider = None
-     
+
+    comments = Comment.objects.filter(product=product).order_by('-time')
+
     return render(request, "auctions/listing.html", 
     {
         "product": product,
@@ -183,7 +194,9 @@ def listing(request,id):
          "res": res,
          "highest_bid": top_bid,
          "count": no_bids,
-         "bidder": bider
+         "bidder": bider,
+         "CommentForm": CommentForm(),
+         "comments": comments
     })
     
 @login_required(login_url='login')
@@ -241,4 +254,30 @@ def bid(request,id):
                    global_var["res"] = "Low"
           
             return HttpResponseRedirect(reverse("listing", args=(id,)))
+    
+@login_required(login_url='login')   
+def closeAuction(request,id):
+    if request.method == "POST":
+        product = auctionProduct.objects.get(pk=id)
+        q = Bids.objects.filter(product=product).order_by('-top_bid').first()
+        product.active = False
+        product.winner = User.objects.get(pk=q.bider.id)
+        product.save()
+        return HttpResponseRedirect(reverse("listing", args=(id,)))
+    
+
+@login_required(login_url='login')   
+def addComment(request,id):
+    if request.method == "POST":
+        form = CommentForm(request.POST)
+
+        if form.is_valid():
+            comment = form.cleaned_data["Comment"]
+            product = auctionProduct.objects.get(pk=id)
+            user = User.objects.get(pk=request.user.id)
+            q = Comment(comment=comment,commenter=user,product=product)
+            q.save()
+            return HttpResponseRedirect(reverse("listing", args=(id,)))
+        else:
+            return HttpResponse("Invalid Form Entry!!")
     
