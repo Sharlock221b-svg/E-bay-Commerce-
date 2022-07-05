@@ -1,0 +1,12 @@
+{% extends "auctions/layout.html" %}
+
+
+{% block body %}
+    <h2>Categories</h2>
+    
+    <div class="activeListing">
+        {% for category  in categories %}
+           <a href="{% url 'getProduct' category.0 %}" class="link-warning" style="padding: 4px; font-size: 24px; color: #4A7665">{{ category.1 }}</a>
+        {% endfor %}
+    </div>
+{% endblock %}

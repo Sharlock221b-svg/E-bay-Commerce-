@@ -83,3 +83,7 @@ span{
     margin-top: 9px;
  }
 
+a{
+    text-decoration: none;
+    color:rgb(176, 174, 174)
+}
