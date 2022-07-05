@@ -1,4 +1,3 @@
-from itertools import product
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
@@ -17,7 +16,9 @@ CATEGORIES = [
     ('books','Books'),
     ('coumputers','Computers'),
     ('real estate', 'Real Estate'),
-    ('sports', 'Sports')
+    ('sports', 'Sports'),
+    ('eatery', 'Eatery'),
+    ('study', 'Study')
 ]
 
 global_var = {
@@ -263,6 +264,7 @@ def closeAuction(request,id):
         product.active = False
         product.winner = User.objects.get(pk=q.bider.id)
         product.save()
+        Wishlist.objects.filter(product=product).delete()
         return HttpResponseRedirect(reverse("listing", args=(id,)))
     
 
@@ -281,3 +283,16 @@ def addComment(request,id):
         else:
             return HttpResponse("Invalid Form Entry!!")
     
+@login_required(login_url='login')   
+def watchlist(request):
+        user = User.objects.get(pk=request.user.id)
+        q = Wishlist.objects.filter(user=user).values()
+        product_id = []
+        for i in q:
+            product_id.append(i['product_id'])
+        products = auctionProduct.objects.filter(id__in=product_id)
+        print(products)
+        return render(request,"auctions/watchlist.html", {
+            "products": products 
+        })
+        

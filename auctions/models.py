@@ -62,7 +62,7 @@ class Wishlist(models.Model):
        * Product => Fk
     """
     user = models.ForeignKey(User,on_delete=models.CASCADE)
-    product = models.ForeignKey(auctionProduct,on_delete=models.CASCADE)
+    product = models.ForeignKey(auctionProduct,on_delete=models.CASCADE, related_name="watchProducts")
 
     class Meta:
      unique_together = ('user', 'product',)

@@ -32,7 +32,7 @@
 
 {% block warning %}
    {% if user.is_authenticated %}
-   
+
    {% if res == "Low" %}
    <div class="alert alert-danger" role="alert" style="background-color: #ff7f70">
       Your Bid should be at least greater than the Highest Bid or the Base Price.
@@ -118,7 +118,7 @@
     {% endif %}
 
 
-    {% if user.is_authenticated %}
+    {% if user.is_authenticated  and product.active %}
     <div class="comment">
       <div class="card-footer py-3 border-0">
          <form action="{% url 'addComment' product.id %}" method="post">
